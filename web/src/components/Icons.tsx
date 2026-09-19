@@ -42,6 +42,20 @@ export function EventIcon({ cat, size = 16 }: { cat: EventCategory; size?: numbe
   );
 }
 
+/** LILA wordmark, served from public/. Its black background doubles as the tile. */
+export function BrandLogo({ size = 36 }: { size?: number }) {
+  return (
+    <img
+      className="brand-logo"
+      src={`${import.meta.env.BASE_URL}lila-logo.png`}
+      width={size}
+      height={size}
+      alt=""
+      aria-hidden="true"
+    />
+  );
+}
+
 /** Dark rounded tile that hosts a map-colored icon, so it looks the same in light and dark UI. */
 export function IconTile({ children, size = 28 }: { children: ReactNode; size?: number }) {
   return (

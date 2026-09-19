@@ -1,6 +1,6 @@
 import type { ViewMode } from "../lib/types";
 import type { Theme } from "../lib/useTheme";
-import { ActorIcon, HeatmapIcon, HelpIcon, MoonIcon, PlaybackIcon, SunIcon } from "./Icons";
+import { BrandLogo, HeatmapIcon, HelpIcon, MoonIcon, PlaybackIcon, SunIcon } from "./Icons";
 import { Button } from "./ui";
 
 interface Props {
@@ -20,9 +20,7 @@ export default function Header({ viewMode, onSetViewMode, theme, onToggleTheme, 
   return (
     <header className="app-header">
       <div className="brand">
-        <span className="brand-mark" aria-hidden="true">
-          <ActorIcon kind="human" size={16} color="#fff" />
-        </span>
+        <BrandLogo size={36} />
         <div className="brand-text">
           <span className="brand-name">Player Journey Explorer</span>
           <span className="brand-sub">LILA BLACK telemetry</span>

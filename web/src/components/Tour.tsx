@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ViewMode } from "../lib/types";
-import { ActorIcon } from "./Icons";
+import { BrandLogo } from "./Icons";
 import { Button } from "./ui";
 
 const KEY = "lila-tour-seen";
@@ -285,9 +285,7 @@ export default function Tour({ open, viewMode, onSetViewMode, onClose }: Props) 
         style={{ top: pos?.top ?? 0, left: pos?.left ?? 0, visibility: pos ? "visible" : "hidden" }}
       >
         {isWelcome && (
-          <span className="tour-mark" aria-hidden="true">
-            <ActorIcon kind="human" size={22} color="#fff" />
-          </span>
+          <BrandLogo size={48} />
         )}
         <h2 id="tour-title" className="tour-title">
           {step.title}
