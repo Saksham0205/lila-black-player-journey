@@ -1,0 +1,11 @@
+.claude/
+node_modules/
+web/dist/
+web/dev-dist/
+web/tsconfig.tsbuildinfo
+.DS_Store
+*.log
+pipeline/.venv/
+pipeline/__pycache__/
+.env
+.env.local
