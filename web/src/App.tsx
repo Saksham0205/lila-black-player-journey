@@ -3,8 +3,11 @@ import Sidebar from "./components/Sidebar";
 import MapCanvas from "./components/MapCanvas";
 import Timeline from "./components/Timeline";
 import InspectorPanel from "./components/InspectorPanel";
+import Header from "./components/Header";
+import Tour, { hasSeenTour, markTourSeen } from "./components/Tour";
 import { loadAggregate, loadManifest, loadMatch } from "./lib/api";
 import { usePlayback } from "./lib/usePlayback";
+import { useTheme } from "./lib/useTheme";
 import type {
   EventCategory,
   HeatmapCategory,
@@ -17,12 +20,14 @@ import type {
 const ALL_CATEGORIES: EventCategory[] = ["kill", "death", "storm", "loot"];
 
 export default function App() {
+  const [theme, toggleTheme] = useTheme();
+  const [tourOpen, setTourOpen] = useState(() => !hasSeenTour());
   const [manifest, setManifest] = useState<Manifest | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [selectedMap, setSelectedMap] = useState<MapId>("AmbroseValley");
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
-  const [viewMode, setViewMode] = useState<ViewMode>("overview");
+  const [viewMode, setViewMode] = useState<ViewMode>("playback");
   const [heatmapCategory, setHeatmapCategory] = useState<HeatmapCategory>("traffic");
 
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
@@ -126,6 +131,11 @@ export default function App() {
     };
   }, [viewMode, selectedMap, selectedDates, heatmapCategory]);
 
+  function closeTour() {
+    markTourSeen();
+    setTourOpen(false);
+  }
+
   function toggleCategory(c: EventCategory) {
     setVisibleCategories((prev) => {
       const next = new Set(prev);
@@ -139,24 +149,27 @@ export default function App() {
     return <div className="app-error">Failed to load data: {error}</div>;
   }
   if (!manifest) {
-    return <div className="app-loading">Loading LILA BLACK telemetry…</div>;
+    return <div className="app-loading">Loading telemetry…</div>;
   }
 
   const mapConfig = manifest.maps[selectedMap];
 
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>LILA BLACK — Player Journey Explorer</h1>
-        <p>Level design tool for player movement, combat, and storm-death patterns across all 3 maps.</p>
-      </header>
+      <Header
+        viewMode={viewMode}
+        onSetViewMode={setViewMode}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onStartTour={() => setTourOpen(true)}
+      />
+      <Tour open={tourOpen} viewMode={viewMode} onSetViewMode={setViewMode} onClose={closeTour} />
       <div className="app-body">
         <Sidebar
           manifest={manifest}
           selectedMap={selectedMap}
           onSelectMap={handleSelectMap}
           viewMode={viewMode}
-          onSetViewMode={setViewMode}
           availableDates={availableDatesForMap}
           selectedDates={selectedDates}
           onToggleDate={toggleDate}
@@ -167,7 +180,7 @@ export default function App() {
           selectedMatchId={selectedMatchId}
           onSelectMatch={setSelectedMatchId}
         />
-        <main className="stage">
+        <main className="stage" data-tour="stage">
           <MapCanvas
             mapConfig={mapConfig}
             mode={viewMode}

@@ -1,5 +1,6 @@
+import type { ReactNode } from "react";
 import type { EventCategory, HeatmapCategory, MatchDetail, MatchSummary, ViewMode } from "../lib/types";
-import { colors } from "../lib/theme";
+import { ActorIcon, EventIcon, IconTile } from "./Icons";
 
 interface Props {
   viewMode: ViewMode;
@@ -18,20 +19,32 @@ interface Props {
   onFocusPlayer: (i: number | null) => void;
 }
 
-const CATS: { key: EventCategory; color: string; label: string; glyph: string }[] = [
-  { key: "kill", color: colors.kill, label: "Kill", glyph: "⊕" },
-  { key: "death", color: colors.death, label: "Death", glyph: "✕" },
-  { key: "storm", color: colors.storm, label: "Storm Death", glyph: "◔" },
-  { key: "loot", color: colors.loot, label: "Loot", glyph: "◆" },
+const CATS: { key: EventCategory; label: string }[] = [
+  { key: "kill", label: "Kill" },
+  { key: "death", label: "Death" },
+  { key: "storm", label: "Storm death" },
+  { key: "loot", label: "Loot" },
 ];
 
 const HEATMAP_LABEL: Record<HeatmapCategory, string> = {
-  traffic: "movement samples",
-  kill: "kills",
-  death: "deaths",
-  storm: "storm deaths",
-  loot: "loot pickups",
+  traffic: "Movement samples",
+  kill: "Kills",
+  death: "Deaths",
+  storm: "Storm deaths",
+  loot: "Loot pickups",
 };
+
+function Stat({ label, value, icon }: { label: string; value: ReactNode; icon?: ReactNode }) {
+  return (
+    <div className="stat">
+      <div className="stat-label">
+        {icon}
+        {label}
+      </div>
+      <div className="stat-value">{value}</div>
+    </div>
+  );
+}
 
 export default function InspectorPanel({
   viewMode,
@@ -49,111 +62,102 @@ export default function InspectorPanel({
   focusedPlayer,
   onFocusPlayer,
 }: Props) {
+  const inPlayback = viewMode === "playback";
+
   return (
-    <aside className="inspector">
-      <div className="sidebar-section">
-        <div className="sidebar-label">Actors</div>
-        <label className="check-row">
-          <input type="checkbox" checked={showHumans} onChange={onToggleHumans} />
-          <span className="swatch" style={{ background: colors.human }} />
-          Humans
-        </label>
-        <label className="check-row">
-          <input type="checkbox" checked={showBots} onChange={onToggleBots} />
-          <span className="swatch swatch-bot" style={{ background: colors.bot }} />
-          Bots
-        </label>
-      </div>
-
-      <div className="sidebar-section">
-        <div className="sidebar-label">Event types</div>
-        {CATS.map((c) => (
-          <label className="check-row" key={c.key}>
-            <input
-              type="checkbox"
-              checked={visibleCategories.has(c.key)}
-              onChange={() => onToggleCategory(c.key)}
-              disabled={viewMode !== "playback"}
-            />
-            <span className="glyph-key" style={{ color: c.color }}>
-              {c.glyph}
-            </span>
-            {c.label}
+    <aside className="inspector" aria-label="Display options">
+      <section className="panel-section" data-tour="actors">
+        <h2 className="panel-title">Actors</h2>
+        <div className="option-list">
+          <label className="option">
+            <input type="checkbox" checked={showHumans} onChange={onToggleHumans} />
+            <IconTile size={24}>
+              <ActorIcon kind="human" size={15} />
+            </IconTile>
+            <span className="option-label">Humans</span>
           </label>
-        ))}
-        {viewMode !== "playback" && <div className="hint-text">Select a match to filter by event type.</div>}
-      </div>
+          <label className="option">
+            <input type="checkbox" checked={showBots} onChange={onToggleBots} />
+            <IconTile size={24}>
+              <ActorIcon kind="bot" size={15} />
+            </IconTile>
+            <span className="option-label">Bots</span>
+          </label>
+        </div>
+      </section>
 
-      <div className="sidebar-section stats-section">
-        <div className="sidebar-label">Stats</div>
-        {viewMode === "overview" ? (
-          <ul className="stat-list">
-            <li>
-              <span>Matches in view</span>
-              <b>{overviewMatchCount}</b>
-            </li>
-            <li>
-              <span>Plotted {HEATMAP_LABEL[heatmapCategory]}</span>
-              <b>{overviewPointCount.toLocaleString()}</b>
-            </li>
-          </ul>
+      <section className="panel-section" data-tour="events">
+        <h2 className="panel-title">Events</h2>
+        <div className="option-list">
+          {CATS.map((c) => (
+            <label className="option" key={c.key}>
+              <input
+                type="checkbox"
+                checked={visibleCategories.has(c.key)}
+                onChange={() => onToggleCategory(c.key)}
+                disabled={!inPlayback}
+              />
+              <IconTile size={24}>
+                <EventIcon cat={c.key} size={15} />
+              </IconTile>
+              <span className="option-label">{c.label}</span>
+            </label>
+          ))}
+        </div>
+        {!inPlayback && <p className="hint-text">Event filters apply in Match playback.</p>}
+      </section>
+
+      <section className="panel-section">
+        <h2 className="panel-title">Stats</h2>
+        {!inPlayback ? (
+          <div className="stat-grid stat-grid-single">
+            <Stat label="Matches" value={overviewMatchCount.toLocaleString()} />
+            <Stat label={HEATMAP_LABEL[heatmapCategory]} value={overviewPointCount.toLocaleString()} />
+          </div>
         ) : matchSummary ? (
-          <ul className="stat-list">
-            <li>
-              <span>Humans / Bots</span>
-              <b>
-                {matchSummary.humans} / {matchSummary.bots}
-              </b>
-            </li>
-            <li>
-              <span>Kills logged</span>
-              <b>{matchSummary.kills}</b>
-            </li>
-            <li>
-              <span>Deaths logged</span>
-              <b>{matchSummary.deaths}</b>
-            </li>
-            <li>
-              <span>Storm deaths</span>
-              <b>{matchSummary.stormDeaths}</b>
-            </li>
-            <li>
-              <span>Loot events</span>
-              <b>{matchSummary.loot}</b>
-            </li>
-            <li>
-              <span>Duration</span>
-              <b>
-                {Math.floor(matchSummary.durationSec / 60)}m {matchSummary.durationSec % 60}s
-              </b>
-            </li>
-          </ul>
+          <div className="stat-grid">
+            <Stat label="Humans" value={matchSummary.humans} icon={<ActorIcon kind="human" size={14} />} />
+            <Stat label="Bots" value={matchSummary.bots} icon={<ActorIcon kind="bot" size={14} />} />
+            <Stat label="Kills" value={matchSummary.kills} icon={<EventIcon cat="kill" size={14} />} />
+            <Stat label="Deaths" value={matchSummary.deaths} icon={<EventIcon cat="death" size={14} />} />
+            <Stat label="Storm deaths" value={matchSummary.stormDeaths} icon={<EventIcon cat="storm" size={14} />} />
+            <Stat label="Loot" value={matchSummary.loot} icon={<EventIcon cat="loot" size={14} />} />
+            <Stat
+              label="Duration"
+              value={`${Math.floor(matchSummary.durationSec / 60)}m ${matchSummary.durationSec % 60}s`}
+            />
+          </div>
         ) : (
-          <div className="hint-text">Pick a match from the left to see its stats.</div>
+          <p className="hint-text">Select a match to see its stats.</p>
         )}
-      </div>
+      </section>
 
       {matchDetail && (
-        <div className="sidebar-section roster-section">
-          <div className="sidebar-label-row">
-            <span className="sidebar-label">Players</span>
-            <span className="sidebar-count">{matchDetail.players.length}</span>
+        <section className="panel-section">
+          <div className="panel-title-row">
+            <h2 className="panel-title">Players</h2>
+            <span className="count-pill">{matchDetail.players.length}</span>
           </div>
           <div className="roster-list">
             {matchDetail.players.map((p, idx) => (
               <button
                 key={p.id + idx}
+                type="button"
+                aria-pressed={focusedPlayer === idx}
                 className={"roster-row" + (focusedPlayer === idx ? " active" : "")}
                 onMouseEnter={() => onFocusPlayer(idx)}
                 onMouseLeave={() => onFocusPlayer(null)}
                 onClick={() => onFocusPlayer(focusedPlayer === idx ? null : idx)}
               >
-                <span className="swatch" style={{ background: p.bot ? colors.bot : colors.human }} />
+                <IconTile size={24}>
+                  <ActorIcon kind={p.bot ? "bot" : "human"} size={15} />
+                </IconTile>
                 <span className="roster-id">{p.bot ? `Bot ${p.id}` : p.id.slice(0, 8)}</span>
+                <span className="roster-kind">{p.bot ? "Bot" : "Human"}</span>
               </button>
             ))}
           </div>
-        </div>
+        </section>
       )}
     </aside>
   );

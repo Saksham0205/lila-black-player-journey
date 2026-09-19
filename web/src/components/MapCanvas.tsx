@@ -3,6 +3,7 @@ import type { EventCategory, MapConfig, MatchDetail } from "../lib/types";
 import { worldToPixel } from "../lib/coords";
 import { drawHeatmap } from "../lib/heatmap";
 import { drawEventGlyph, interpolatePosition } from "../lib/render";
+import { drawActor } from "../lib/actors";
 import { colors } from "../lib/theme";
 import { minimapUrl } from "../lib/api";
 
@@ -184,15 +185,11 @@ export default function MapCanvas({
         if (pos) {
           const [px, py] = toPixel(pos[0], pos[1]);
           ctx.globalAlpha = dim ? 0.3 : 1;
-          const r = isFocused ? 6 : p.bot ? 3.5 : 4.5;
-          ctx.beginPath();
-          ctx.arc(px, py, r, 0, Math.PI * 2);
-          ctx.fillStyle = p.bot ? colors.bot : colors.human;
-          ctx.fill();
-          // Dark ring on every marker -- keeps it legible over light/mid terrain art too.
-          ctx.lineWidth = 1.5;
-          ctx.strokeStyle = "#0d0d0d";
-          ctx.stroke();
+          // Humans are drawn slightly larger than bots so they stay the primary read.
+          const size = isFocused ? 26 : p.bot ? 17 : 20;
+          drawActor(ctx, p.bot ? "bot" : "human", px, py, size, p.bot ? colors.bot : colors.human, {
+            ring: isFocused,
+          });
         }
         ctx.globalAlpha = 1;
       });
@@ -231,7 +228,7 @@ export default function MapCanvas({
       if (!pos) return;
       const [px, py] = toPixel(pos[0], pos[1]);
       const d2 = (px - mx) ** 2 + (py - my) ** 2;
-      if (d2 < 100 && (!best || d2 < best.d2)) {
+      if (d2 < 196 && (!best || d2 < best.d2)) {
         best = { d2, label: `${p.bot ? "Bot" : "Player"} ${p.id.slice(0, 8)}`, idx };
       }
     });
@@ -267,7 +264,7 @@ export default function MapCanvas({
       />
       {!image && <div className="map-loading">Loading minimap…</div>}
       {hover && (
-        <div className="map-tooltip" style={{ left: hover.x + 14, top: hover.y + 10 }}>
+        <div className="map-tooltip" style={{ left: hover.x + 16, top: hover.y + 12 }}>
           {hover.label}
         </div>
       )}
