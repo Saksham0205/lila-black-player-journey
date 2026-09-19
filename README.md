@@ -4,7 +4,7 @@ A browser-based tool for LILA Games' Level Design team to explore player movemen
 loot, and storm-death patterns across LILA BLACK's three maps, built from 5 days of production
 telemetry.
 
-**Live tool:** _add your Vercel URL here after deploying_
+**Live tool:** https://lila-black-player-journey-ten.vercel.app/
 
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for design decisions, data flow, and the coordinate
 mapping walkthrough, and [`INSIGHTS.md`](INSIGHTS.md) for three data-backed findings about the
