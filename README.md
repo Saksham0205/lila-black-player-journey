@@ -4,7 +4,7 @@ A browser-based tool for LILA Games' Level Design team to explore player movemen
 loot, and storm-death patterns across LILA BLACK's three maps, built from 5 days of production
 telemetry.
 
-**Live tool:** https://saksham0205.github.io/lila-black-player-journey/
+**Live tool:** _add your Vercel URL here after deploying_
 
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for design decisions, data flow, and the coordinate
 mapping walkthrough, and [`INSIGHTS.md`](INSIGHTS.md) for three data-backed findings about the
@@ -25,7 +25,7 @@ game itself.
   runtime service.
 - **Frontend:** Vite + React + TypeScript, rendering to a single `<canvas>` (no map/chart
   library).
-- **Hosting:** static build, deployed to GitHub Pages via GitHub Actions.
+- **Hosting:** static build, deployed to Vercel.
 
 There is no backend, no database, and no environment variables — everything the app needs is
 pre-computed JSON + WebP images served as static files.
@@ -66,25 +66,7 @@ python build_data.py          # writes web/public/data/
 python prepare_minimaps.py    # writes web/public/minimaps/
 ```
 
-## Building / deploying
-
-```bash
-cd web
-npm run build      # outputs web/dist
-```
-
-`web/dist` is a fully static site — deploy it anywhere (GitHub Pages, Vercel, Netlify,
-Railway...). No environment variables, no serverless functions, no database.
-
-### GitHub Pages (this repo's live URL)
-
-Deploys automatically via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) on
-every push to `main`. GitHub Pages serves a project site from a `/<repo-name>/` subpath, so the
-workflow sets `GITHUB_PAGES=true` during the build, which flips `base` in `vite.config.ts` to
-`/lila-black-player-journey/`. Every other host serves from the domain root, so `base` defaults
-to `/` when that variable isn't set (local dev, Vercel, Netlify, etc. all get this by default).
-
-### Vercel
+## Deploying (Vercel)
 
 Since the app lives in the `web/` subfolder of the repo (not the repo root), set the **Root
 Directory** accordingly:
@@ -101,6 +83,5 @@ cd web
 npx vercel --prod
 ```
 
-Either way, Vercel builds with `base: "/"` (the `GITHUB_PAGES` env var is only set by the
-GitHub Actions workflow above), so assets resolve correctly at the domain root Vercel gives
-you.
+No custom `base` path is needed in `vite.config.ts` — Vercel serves the app from the domain
+root, so the default Vite config works as-is.

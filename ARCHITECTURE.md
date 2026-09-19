@@ -7,7 +7,7 @@
 | Data pipeline | Python (pandas + pyarrow), one-time script | The source data is Parquet; pandas/pyarrow is the path of least resistance to read it, fix the data quirks below, and re-shape it. Runs once at build time, not per-request. |
 | Frontend | Vite + React + TypeScript | Fast dev loop, small bundle, no framework overhead for what is fundamentally one interactive canvas + a control panel. |
 | Rendering | Native HTML5 Canvas (no map/charting library) | Full control over the world→pixel projection, per-frame playback redraws, and a custom density heatmap — all cheap operations that don't need a mapping library's overhead (Leaflet/Mapbox are built for lat/lng tiles, not a static minimap with a linear projection). |
-| Hosting | Static site (GitHub Pages) | Everything the tool needs is pre-computed JSON + images — there is no backend, no database, and no server-side logic at request time, so static hosting is sufficient and free. |
+| Hosting | Static site (Vercel) | Everything the tool needs is pre-computed JSON + images — there is no backend, no database, and no server-side logic at request time, so static hosting is sufficient and free. |
 
 **No backend / database at runtime.** All 796 matches, ~89k events, and per-map/day
 aggregates are pre-processed into flat JSON files once, checked into the repo under
