@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import Sidebar from "./components/Sidebar";
 import MapCanvas from "./components/MapCanvas";
 import Timeline from "./components/Timeline";
@@ -223,6 +224,7 @@ export default function App() {
           onFocusPlayer={setFocusedPlayer}
         />
       </div>
+      <Analytics />
     </div>
   );
 }
