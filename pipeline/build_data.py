@@ -1,37 +1,3 @@
-"""
-LILA BLACK - Player Journey Data Pipeline
-==========================================
-
-Reads the raw per-player parquet files (extension `.nakama-0`) from
-`player_data/`, corrects two data quality issues discovered during
-inspection (see ARCHITECTURE.md -> "Assumptions & data quirks"), and
-emits compact, web-friendly JSON under `web/public/data/` that the
-frontend fetches directly (no backend / database needed at runtime).
-
-Run:
-    python pipeline/build_data.py
-
-Data quirks handled here:
-  0. Exact duplicate rows are dropped (see load_all_rows).
-  1. Timestamps: the parquet `ts` column is typed `timestamp[ms]`, but
-     the underlying integer is actually a Unix timestamp in SECONDS
-     (verified against the real Feb 2026 recording dates). Reading it
-     as literal milliseconds produces bogus "1970-01-21" dates. We
-     recover the true wall-clock time as `raw_int * 1000` ms-since-epoch.
-  2. `match_id` column values carry a redundant trailing `.nakama-0`
-     suffix (the server instance tag) that we strip for a clean id.
-  3. `BotKill` / `BotKilled` are NOT exclusively human-perspective
-     events as the README states -- bot-owned files also log them
-     (e.g. a bot that lands a kill gets `BotKill` in its own file).
-     Since the schema has no killer/victim pair id, we cannot draw
-     attributed kill lines; we simply bucket every combat event into
-     4 categories from the *file owner's* point of view:
-        Kill / BotKill        -> "kill"   (owner scored a kill)
-        Killed / BotKilled    -> "death"  (owner was killed by a player/bot)
-        KilledByStorm         -> "storm"  (owner died to the storm)
-        Loot                  -> "loot"   (owner picked up an item)
-     This matches exactly the 4 marker categories requested by the brief.
-"""
 from __future__ import annotations
 
 import json

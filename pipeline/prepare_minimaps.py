@@ -1,15 +1,3 @@
-"""
-Downscale + re-encode the source minimap images for the web.
-
-The originals are much larger than the README's reference 1024x1024
-(AmbroseValley 4320x4320, GrandRift 2160x2158, Lockdown 9000x9000) and
-total ~24MB. Since the world-to-minimap formula operates in a 0-1 UV
-space (see build_data.py / src/lib/coords.ts), any resolution works --
-we only need enough pixels to look sharp on a large monitor. We cap
-the longest edge at 2048px and re-encode as WebP for a much smaller
-payload, which matters for a tool that should load fast for a level
-designer clicking around.
-"""
 import os
 from PIL import Image
 

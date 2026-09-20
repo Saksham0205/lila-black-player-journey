@@ -1,6 +1,6 @@
 # INSIGHTS — Three things learned about LILA BLACK
 
-Source: all 5 days of telemetry (Feb 9–14, 2026 UTC) after de-duplication: 796 matches, 87,599
+Source: all 5 days of telemetry (Feb 10–14, 2026) after de-duplication: 796 matches, 87,599
 events, 781 human journeys. "Journey" = one human's file in one match. Every number here comes
 from `web/public/data/` (the pipeline output) and can be reproduced by re-running
 `pipeline/build_data.py`. Only human-owned files are used for kill/death counts, because a human's
