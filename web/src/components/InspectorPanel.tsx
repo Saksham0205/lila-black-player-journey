@@ -133,7 +133,7 @@ export default function InspectorPanel({
       </section>
 
       {matchDetail && (
-        <section className="panel-section">
+        <section className="panel-section roster-section">
           <div className="panel-title-row">
             <h2 className="panel-title">Players</h2>
             <span className="count-pill">{matchDetail.players.length}</span>

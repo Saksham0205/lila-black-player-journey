@@ -1,4 +1,4 @@
-import { ActorIcon } from "./Icons";
+import { ActorIcon, IconTile } from "./Icons";
 import { Button } from "./ui";
 import { minimapUrl } from "../lib/api";
 import type { HeatmapCategory, MapId, Manifest, MatchSummary, ViewMode } from "../lib/types";
@@ -157,12 +157,16 @@ export default function Sidebar({
                   <span className="match-duration">{formatDuration(m.durationSec)}</span>
                 </span>
                 <span className="match-card-bottom">
-                  <span className="actor-chip" title={`${m.humans} humans`}>
-                    <ActorIcon kind="human" size={13} />
+                  <span className="match-actors" title={`${m.humans} humans`}>
+                    <IconTile size={18}>
+                      <ActorIcon kind="human" size={12} />
+                    </IconTile>
                     {m.humans}
                   </span>
-                  <span className="actor-chip" title={`${m.bots} bots`}>
-                    <ActorIcon kind="bot" size={13} />
+                  <span className="match-actors" title={`${m.bots} bots`}>
+                    <IconTile size={18}>
+                      <ActorIcon kind="bot" size={12} />
+                    </IconTile>
                     {m.bots}
                   </span>
                   {m.kills + m.deaths > 0 && <span className="lozenge lozenge-combat">{m.kills + m.deaths} combat</span>}

@@ -65,23 +65,3 @@ pip install -r requirements.txt
 python build_data.py          # writes web/public/data/
 python prepare_minimaps.py    # writes web/public/minimaps/
 ```
-
-## Deploying (Vercel)
-
-Since the app lives in the `web/` subfolder of the repo (not the repo root), set the **Root
-Directory** accordingly:
-
-1. [vercel.com/new](https://vercel.com/new) → import this GitHub repo.
-2. **Root Directory:** `web`. Framework preset: **Vite** (auto-detected). Build command
-   (`npm run build`) and output directory (`dist`) are also auto-detected.
-3. No environment variables needed. Deploy.
-
-Or via CLI, from the `web/` folder:
-
-```bash
-cd web
-npx vercel --prod
-```
-
-No custom `base` path is needed in `vite.config.ts` — Vercel serves the app from the domain
-root, so the default Vite config works as-is.
