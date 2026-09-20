@@ -1,9 +1,3 @@
-// Data colors. The interface chrome is neutral (see styles.css); color is reserved
-// for what's on the map so it always means something. Five categorical roles
-// (human + 4 event types) exceed the safe all-pairs hue budget for a 5-slot
-// categorical set, so every marker also carries a distinct shape -- color is
-// reinforcement, not the only signal. Humans and bots differ by figure as well as tint.
-
 export const colors = {
   human: "#4c9aff", // person figure
   bot: "#c9c3b6", // robot figure: neutral so it recedes behind humans, shape carries identity

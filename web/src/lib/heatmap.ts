@@ -39,12 +39,6 @@ function buildStamp(radius: number): HTMLCanvasElement {
   return stamp;
 }
 
-/**
- * Draws a density heatmap of `points` (in destination pixel space) onto `ctx`.
- * Classic simpleheat-style approach: accumulate soft circular "stamps" per
- * point into an offscreen alpha channel, then remap alpha through a
- * single-hue sequential color ramp (never a rainbow -- see theme.ts).
- */
 export function drawHeatmap(
   ctx: CanvasRenderingContext2D,
   points: Array<[number, number]>,

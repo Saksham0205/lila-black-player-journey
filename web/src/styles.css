@@ -1,16 +1,3 @@
-/*
-  Design system
-  -------------
-  Structure follows Atlassian's design language (surface / sunken / raised layers,
-  neutral text ramp, 6px controls, 8px cards); the brand color is Loom purple so blue
-  stays free for what it means on the map (humans, heatmap). Map data colors live in
-  src/lib/theme.ts. The map stage is dark in both themes so minimap art reads well.
-
-  Selection pattern:   list item  -> brand-subtle fill + brand border
-                       toggle chip -> brand-subtle fill + brand border
-                       primary CTA -> solid brand (one per view: Play)
-*/
-
 :root,
 :root[data-theme="light"] {
   color-scheme: light;

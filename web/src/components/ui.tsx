@@ -7,7 +7,6 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode;
 }
 
-/** Design-system button. `primary` is reserved for the single main action in a view. */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { variant = "secondary", size = "md", iconOnly = false, icon, className = "", children, ...rest },
   ref

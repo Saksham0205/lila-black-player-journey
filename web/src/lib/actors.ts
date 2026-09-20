@@ -1,7 +1,3 @@
-// Shared 2-D shapes for actors and events, defined once as SVG path data on a
-// 24x24 grid. The map canvas draws them through Path2D and the React legends
-// render the exact same `d` strings, so a figure looks identical everywhere.
-
 export type ActorKind = "human" | "bot";
 
 export const ACTOR_PATH: Record<ActorKind, string> = {

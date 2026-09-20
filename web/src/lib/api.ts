@@ -37,7 +37,6 @@ export function loadAggregate(map: MapId, date: string): Promise<AggregateData> 
   let p = aggCache.get(key);
   if (!p) {
     const safeDate = date.replace(/-/g, "");
-    // Not every map has a match on every recorded date -- treat a missing
     // aggregate file as "no data that day" rather than an error.
     p = getJson<AggregateData>(`${base}data/aggregates/${map}/${safeDate}.json`).catch(() =>
       emptyAggregate(map, date)
