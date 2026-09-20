@@ -1,123 +1,104 @@
 # INSIGHTS — Three things learned about LILA BLACK
 
-Generated using the Player Journey Explorer against all 5 days of telemetry (Feb 9–14, 2026;
-796 matches, 89,104 events, 339 unique player/bot ids). Exact figures below come from
-`pipeline/build_data.py`'s output (`web/public/data/manifest.json`) and can be reproduced by
-re-running the pipeline.
+Source: all 5 days of telemetry (Feb 9–14, 2026 UTC) after de-duplication: 796 matches, 87,599
+events, 781 human journeys. "Journey" = one human's file in one match. Every number here comes
+from `web/public/data/` (the pipeline output) and can be reproduced by re-running
+`pipeline/build_data.py`. Only human-owned files are used for kill/death counts, because a human's
+file logs both sides of their own fights, so those ratios are not distorted by missing files.
+
+**Read this caveat first.** 779 of 796 matches contain exactly one human file (16 contain none, and
+only one has two humans). This export can therefore say almost nothing about human-vs-human play:
+there are just 6 `Kill`/`Killed` events in total. None of the insights below relies on PvP.
 
 ---
 
-## 1. Human-vs-human combat is almost nonexistent — bots are absorbing nearly all the fights
+## 1. Bots are the main killer of humans, yet humans beat them ~5.5 to 1
 
-**What caught my eye:** Switching the heatmap layer between "Kill zones" and toggling event
-types in Match Playback, I noticed I could barely find a `Kill`/`Killed` marker anywhere,
-while `BotKill`/`BotKilled` markers were everywhere.
+**What stood out:** in Match Playback, nearly every death marker was a bot kill, and deaths were
+far rarer than kills. Counting them confirmed both.
 
-**The pattern:** Across all 796 matches / 5 days:
+**Evidence (human journeys only, de-duplicated):**
 
-| Event | Count |
+| | Count |
 |---|---|
-| `Kill` (human killed a human) | 3 |
-| `Killed` (human killed by a human) | 3 |
-| `BotKill` (killed a bot) | 2,415 |
-| `BotKilled` (killed by a bot) | 700 |
+| Humans killing bots (`BotKill`) | 2,193 (2.8 per journey) |
+| Humans killed by bots (`BotKilled`) | 400 (0.5 per journey; 51% of journeys contain one) |
+| Humans killed by the storm | 39 |
+| Humans killed by other humans | 3 |
 
-Human-vs-human kills make up **0.19%** of all 3,121 combat log entries. Practically every
-recorded fight in the dataset is a human-vs-bot encounter, not a human-vs-human one.
+Bots cause **90.5%** of all recorded human deaths (400 of 442), while humans win bot fights **5.5 : 1**.
+By map: Ambrose Valley 5.5 : 1 (1,639 vs 296), Lockdown 4.7 : 1 (378 vs 80), Grand Rift 7.3 : 1
+(176 vs 24; small sample).
 
-**Actionable:** For an extraction shooter, player-vs-player tension is usually a core part of
-the fantasy ("someone else might be here for the same loot"). Right now the bot population is
-absorbing almost all combat before two human squads ever meet. This affects:
+**Actionable:** bots are the game's real opponent right now, and they lose most fights but still
+end half of all journeys. Metrics affected: bot K/D against humans, journey length, and the share
+of journeys that end in a bot death.
+- Actions: set a target bot-vs-human K/D per map (Grand Rift looks the easiest); if bots are
+  meant to be a threat, move bot spawns and patrol routes toward contested loot POIs rather
+  than open ground; if they are meant to be fodder, the 51% death rate is high enough to check
+  for cheap deaths (spawn-adjacent bots, no cover to reset).
+- The Kill and Death heatmap layers show *where* each side wins: the gap between them is where
+  bots are over- or under-tuned.
 
-- **Player-vs-player encounter rate** — currently near zero.
-- **Perceived match tension / replay value** — humans are fighting a shooting gallery, not
-  each other.
-
-Actionable items: reduce bot density or bot aggression in contested/late-game POIs so humans
-survive long enough to cross paths with each other; or deliberately funnel spawns/extraction
-points to increase human-human overlap, then track the `Kill`/`Killed` count as a KPI to see
-if it moves off ~0.
-
-**Why a level designer should care:** Bot spawn density and POI placement are level-design
-levers. This metric tells you directly whether your map layout is creating human-vs-human
-friction or just dropping players into a bot arena — something that's very hard to see from
-raw telemetry tables but jumps out immediately once kills are plotted on the map.
+**Why a level designer should care:** bot placement and cover layout are level-design levers.
+This one number says whether the maps are producing fair fights.
 
 ---
 
-## 2. Storm-death rate is ~3× higher on Lockdown than on Ambrose Valley, despite it being the smaller map
+## 2. Lockdown has large stretches of map that players almost never visit
 
-**What caught my eye:** Filtering the heatmap to "Storm deaths" and switching between maps,
-Lockdown's storm markers looked disproportionately frequent given how few matches it has
-compared to Ambrose Valley.
+**What stood out:** Lockdown has by far the lowest share of its playable area ever walked. I
+masked out the black void around each island using the minimap image itself, so empty
+space outside the island does not count as "ignored".
 
-**The pattern (storm deaths per match, by map):**
+**Evidence (32×32 grid over each map, playable cells only, all position samples):**
 
-| Map | Matches | Storm deaths | Storm deaths / match |
+| Map | Playable cells visited at all | Cells with ≤3 samples ("cold") | Human loot pickups / match |
 |---|---|---|---|
-| Ambrose Valley (primary, largest) | 566 | 17 | 0.030 |
-| Grand Rift (secondary) | 59 | 5 | 0.085 |
-| **Lockdown** (smaller/close-quarters) | 171 | 17 | **0.099** |
+| Ambrose Valley | 95% | 9% | 15.7 |
+| Grand Rift | 87% | 29% | 12.7 |
+| **Lockdown** | **68%** | **38%** | **11.1** |
 
-Lockdown's per-match storm-death rate is **3.3×** Ambrose Valley's, and Grand Rift's is close
-behind at 2.8× despite a much smaller sample (59 matches — worth re-checking as more data
-comes in). Storm deaths logged also line up almost exactly with the end of the affected
-player's tracked timeline (median 99.9% into their recorded duration) — the storm reliably
-functions as a terminal, non-recoverable elimination.
+On Lockdown the cold ground is mostly the **north half**: 142 of 316 playable cells there are cold,
+against 39 of 164 in the south. Movement and loot line up tightly: across a 20×20 grid the
+correlation between loot pickups and traffic is 0.76–0.88 (Spearman) on all three maps. Players
+walk where the loot is, and the top 5% of cells hold 56–64% of all pickups.
 
-**Actionable:** Since Lockdown is explicitly designed as the compact map, players there have
-less room to relocate as the zone shrinks. This is a testable hypothesis, not a conclusion:
+**Actionable:** Lockdown is the smaller map, so wasted space costs it the most. Metrics affected:
+map-area utilisation, loot pickups per match, and encounter density.
+- Actions: add or upgrade loot in the cold north half of Lockdown (traffic follows loot, so this is
+  the cheapest way to pull players there); if the ground is cold because of blocked routes or
+  poor sightlines, fix that first. Re-run the traffic heatmap after the change and target cold cells < 15%.
 
-- Metric affected: storm-death rate as a fraction of all deaths, per map (currently ~2–3% of
-  deaths overall, but a bigger share of *how* players lose on Lockdown specifically).
-- Actionable items: audit Lockdown's storm shrink-phase timing and safe-zone travel distance
-  vs. time budget relative to the other two maps; check whether Lockdown's chokepoint layout
-  is trapping players away from the safe zone more than intended.
-
-**Why a level designer should care:** Storm pacing is one of the most direct level-design
-levers in an extraction shooter — get it wrong on one map and players feel cheated rather than
-outplayed. This tool lets you see that the imbalance is map-specific, so the fix can be a
-targeted Lockdown timing pass instead of a global storm nerf that would blunt the other two
-maps, which look properly tuned by comparison.
+**Why a level designer should care:** this is the "which areas get ignored" question from the
+brief. It is answerable in seconds with the traffic layer, and the fix is a placement change
+rather than a rebuild.
 
 ---
 
-## 3. ~93% of the matches in this dataset only have one tracked participant — treat cross-match aggregates with care
+## 3. The storm hits Lockdown hardest, and only at the very end
 
-**What caught my eye:** Most matches I opened in Match Playback showed exactly one dot moving
-around an empty map, even though the README describes matches as "typically has multiple
-human players and bots." Only a handful of matches showed a full crowd.
+**What stood out:** Lockdown logged the same number of storm deaths as Ambrose Valley (17 each)
+from under a third of the matches.
 
-**The pattern (participants per match, `humans + bots`):**
+**Evidence:** share of human journeys that end in a storm death:
 
-| Participants in match | # matches |
-|---|---|
-| 1 | 743 (93.3%) |
-| 2 | 1 |
-| 5–8 | 34 |
-| 12–16 | 18 |
+| Map | Journeys | Storm deaths | Rate |
+|---|---|---|---|
+| Ambrose Valley | 554 | 17 | 3.1% |
+| Grand Rift | 57 | 5 | 8.8% |
+| **Lockdown** | 170 | 17 | **10.0%** |
 
-Only **53 of 796 matches (6.7%)** have more than one participant file at all. This also
-explains an odd asymmetry in the raw counts: total `kill`-category events (2,418: `Kill` +
-`BotKill`) are **3.4×** total `death`-category events (703: `Killed` + `BotKilled`). 556
-matches show a human logging a `BotKill` with zero bot files present for that match at all —
-i.e., the victim's own record simply isn't in the sample.
+Lockdown vs Ambrose Valley is 3.3× (Fisher exact test p = 0.0006). Grand Rift is similar but
+rests on 5 deaths (p = 0.045), so treat it as a hint. Storm deaths occur a median **739 s** into
+a journey, against a median journey length of 367 s: the storm only catches players who are still
+alive at the very end of a match, and overall it accounts for 8.8% of human deaths.
 
-**Actionable:** This isn't a game-balance finding — it's a data-completeness finding — but
-it's exactly the kind of thing that silently skews every other metric if it goes unnoticed.
+**Actionable:** Metrics affected: storm deaths as a share of all deaths per map, and time-to-storm-death.
+- Actions: audit Lockdown's final shrink phase (timing and safe-zone travel distance) against
+  the other maps. Because insight 2 shows Lockdown's north is under-used, check whether the safe
+  zone regularly ends somewhere players have no reason to be. This is a hypothesis to test, not a finding.
 
-- Metrics affected: any aggregate computed by joining across participants in a match (true
-  K/D, time-to-kill from paired events, "who killed whom") is unreliable while most matches
-  are single-participant captures. Even the heatmaps in this tool are implicitly weighted
-  toward the ~53 fully-populated matches for anything that needs more than one file to show up
-  (e.g., you cannot see a squad wipe pattern in a 1-participant match).
-- Actionable items: if this reflects a sampling choice in how telemetry was exported, tag
-  matches with a "capture completeness" flag (e.g., `expected_pop` vs. `captured_pop`) so
-  downstream tools — including this one — can filter to fully-captured matches before drawing
-  population-level conclusions. If it reflects genuinely low live bot-fill in most sessions,
-  that's a matchmaking/bot-fill setting worth revisiting on its own.
-
-**Why a level designer should care:** Before trusting any "hot zone" or "storm is worse here"
-conclusion drawn from this tool (including insights #1 and #2 above) at face value for a
-balancing decision, it's worth knowing what fraction of the underlying matches actually had
-enough participants to be representative of a real lobby.
+**Why a level designer should care:** storm deaths feel unfair when they reflect layout and not
+player mistakes. The tool shows the problem is specific to Lockdown (and possibly Grand Rift), so
+the fix is a targeted timing or route pass, not a global storm change.

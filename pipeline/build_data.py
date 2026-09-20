@@ -12,6 +12,7 @@ Run:
     python pipeline/build_data.py
 
 Data quirks handled here:
+  0. Exact duplicate rows are dropped (see load_all_rows).
   1. Timestamps: the parquet `ts` column is typed `timestamp[ms]`, but
      the underlying integer is actually a Unix timestamp in SECONDS
      (verified against the real Feb 2026 recording dates). Reading it
@@ -94,6 +95,14 @@ def load_all_rows() -> pd.DataFrame:
             )
             frames.append(df)
     full = pd.concat(frames, ignore_index=True)
+
+    # --- Drop exact duplicate rows (same owner/match/second/position/event). ---
+    # ~1.5k rows are logged twice; left in, they inflate loot by ~10% and kills by ~2%.
+    before = len(full)
+    full = full.drop_duplicates(
+        subset=["owner_id", "clean_match_id", "ts", "x", "y", "z", "event"], ignore_index=True
+    )
+    print(f"  dropped {before - len(full):,} exact duplicate rows")
 
     # --- Timestamp fix: raw int64 (labelled ms) is actually whole seconds. ---
     raw_seconds = full["ts"].astype("int64")
